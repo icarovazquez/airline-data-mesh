@@ -1,0 +1,15 @@
+name: weather_obs
+version: 1
+owner: Weather
+source: NOAA ASOS via Iowa Environmental Mesonet
+sensitivity: public
+freshness: loaded months only, timestamps in UTC
+path: weather/observations.parquet
+join_keys: [station, valid]
+columns:
+  station: {type: string, note: FAA airport id, matches BTS origin}
+  valid: {type: timestamp, note: UTC}
+  tmpf: {type: number, unit: degrees F}
+  vsby: {type: number, unit: miles}
+  sknt: {type: number, unit: knots}
+  wxcodes: {type: string, note: present-weather codes}
