@@ -3,7 +3,7 @@ name = "airline-mesh"
 version = "0.0.1"
 description = "Mini data mesh for a fictional airline, exposed to agents over MCP"
 requires-python = ">=3.10"
-dependencies = ["duckdb", "pandas", "pyarrow", "requests", "pyyaml"]
+dependencies = ["google-cloud-bigquery", "pandas", "pyarrow", "requests", "pyyaml"]
 
 [build-system]
 requires = ["setuptools>=61"]
