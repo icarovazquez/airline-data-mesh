@@ -6,7 +6,7 @@ Companion to [agentic-ai-investigation-team](https://github.com/icarovazquez/age
 
 ## Status
 
-Notebook 1 (`notebooks/01_build_mesh.ipynb`) builds the first two divisions (network_ops, weather), publishes them to BigQuery and checks the Dec 2022 case. Its code moves into `src/airline_mesh/lake/` as the package grows.
+Notebook 1 (`notebooks/01_build_data_mesh.ipynb`) builds the first two divisions (network_ops, weather), publishes them to BigQuery and checks the Dec 2022 case. Its code moves into `src/airline_mesh/lake/` as the package grows.
 
 To run it you need a Google account and a free Google Cloud project (the BigQuery sandbox needs no billing). Put the project ID in Cell 1.
 
