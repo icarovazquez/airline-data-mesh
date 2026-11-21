@@ -1,0 +1,25 @@
+name: flight_ops
+version: 1
+owner: Network operations
+source: BTS On-Time Performance (carrier self-reported)
+sensitivity: public
+freshness: monthly, loaded months only
+path: flight_ops/flights.parquet
+join_keys: [tail_number, origin, dest, flight_date]
+columns:
+  flight_date: {type: date}
+  carrier: {type: string}
+  tail_number: {type: string}
+  flight_number: {type: string}
+  origin: {type: string}
+  dest: {type: string}
+  crs_dep_time: {type: integer, note: scheduled departure, hhmm local}
+  dep_delay_min: {type: number, unit: minutes}
+  cancelled: {type: number, note: 1 = cancelled}
+  cancel_code: {type: string, note: "A carrier, B weather, C NAS, D security"}
+  diverted: {type: number}
+  carrier_delay_min: {type: number, unit: minutes}
+  weather_delay_min: {type: number, unit: minutes}
+  nas_delay_min: {type: number, unit: minutes}
+  security_delay_min: {type: number, unit: minutes}
+  late_aircraft_delay_min: {type: number, unit: minutes}

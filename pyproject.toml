@@ -1,0 +1,13 @@
+[project]
+name = "airline-mesh"
+version = "0.0.1"
+description = "Mini data mesh for a fictional airline, exposed to agents over MCP"
+requires-python = ">=3.10"
+dependencies = ["duckdb", "pandas", "pyarrow", "requests", "pyyaml"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
