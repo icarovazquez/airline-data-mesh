@@ -16,6 +16,7 @@ To run it you need a Google account and a free Google Cloud project (the BigQuer
 - `src/airline_mesh/catalog/`: contract loader and product search
 - `src/airline_mesh/gateway/`: access policy, PII masking, audit log
 - `src/airline_mesh/server/`: the MCP endpoint
+- `src/airline_mesh/synthetic/`: generator for the synthetic crew and maintenance data (planted-cause worlds)
 - `domains/<division>/`: each division's `contract.yaml` and adapter
 - `notebooks/`: Colab notebooks, one per phase
 
@@ -29,5 +30,7 @@ To run it you need a Google account and a free Google Cloud project (the BigQuer
 | customer | DOT air travel consumer reports | Real |
 | crew | none public | Synthetic |
 | maintenance | none public | Synthetic |
+
+Crew and maintenance are synthetic. `synthetic/generator.py` writes them from the real flight schedule and stated assumptions (all made up, listed in `ASSUMPTIONS`), with two dials (crew effect, maintenance effect) that set the true cause. The true cause is returned as ground truth and never written into a table. Run the tests with `PYTHONPATH=src python3 -m pytest -q`.
 
 BTS delay causes are self-reported by the carrier, so treat them as claims to test.
