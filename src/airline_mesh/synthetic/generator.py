@@ -16,7 +16,9 @@ Design rules (see the spec, "Synthetic divisions"):
   * The true cause is returned separately as ground truth and never written
     into a table.
   * Every number that is an assumption lives in ASSUMPTIONS and is made up.
-  * A fixed seed makes a world reproducible.
+  * A fixed seed makes a world reproducible. Normal crew noise, normal
+    maintenance noise and the planted effect each use their own random stream,
+    so two worlds differ only in the numbers the planted cause touches.
 
 Calibration note: the size of the planted effect is scaled to the real excess
 idleness (baseline aircraft flying minus aircraft flying that day) so the world
@@ -102,7 +104,9 @@ def generate(flights, world, baseline, event=None, assumptions=None):
     Dates must be comparable (e.g. datetime.date objects).
     """
     a = {**ASSUMPTIONS, **(assumptions or {})}
-    rng = np.random.default_rng(world.seed)
+    noise_crew = np.random.default_rng([world.seed, 1])
+    noise_maint = np.random.default_rng([world.seed, 2])
+    effect = np.random.default_rng([world.seed, 3])
     excess = _excess_idle(flights, baseline, event)
     days = list(excess.index)
 
@@ -123,11 +127,11 @@ def generate(flights, world, baseline, event=None, assumptions=None):
     for day in days:
         extra_total = int(round(world.crew_effect * excess[day]
                                 * a["crews_per_aircraft_day"]))
-        extra = rng.multinomial(extra_total, share) if extra_total > 0 \
+        extra = effect.multinomial(extra_total, share) if extra_total > 0 \
             else np.zeros(len(roster), dtype=int)
         for i, base in enumerate(roster.index):
             r, rs, rg = int(roster[base]), int(reserve[base]), int(regular[base])
-            out = min(r, int(rng.binomial(r, a["base_out_rate"])) + int(extra[i]))
+            out = min(r, int(noise_crew.binomial(r, a["base_out_rate"])) + int(extra[i]))
             reg_out = min(rg, int(round(out * rg / r)))
             res_out = min(rs, out - reg_out)
             reg_av, res_av = rg - reg_out, rs - res_out
@@ -135,7 +139,7 @@ def generate(flights, world, baseline, event=None, assumptions=None):
             used = int(np.clip(need - reg_av, 0, res_av))
             duty = (a["base_duty_hours"]
                     + a["duty_stretch_hours"] * used / max(rs, 1)
-                    + rng.normal(0, 0.25))
+                    + noise_crew.normal(0, 0.25))
             rows.append((day, base, int(dep.loc[day, base]), need, r, rs,
                          reg_av + res_av, used, round(float(duty), 2)))
     crew = pd.DataFrame(rows, columns=[
@@ -146,9 +150,9 @@ def generate(flights, world, baseline, event=None, assumptions=None):
     fleet = int(flights["tail_number"].nunique())
     rows = []
     for day in days:
-        oos = int(rng.poisson(a["base_oos_rate"] * fleet)
+        oos = int(noise_maint.poisson(a["base_oos_rate"] * fleet)
                   + round(world.maintenance_effect * excess[day]))
-        defects = int(rng.poisson(a["defects_per_oos_aircraft"] * oos
+        defects = int(noise_maint.poisson(a["defects_per_oos_aircraft"] * oos
                                   + a["base_defect_rate"] * fleet))
         rows.append((day, fleet, oos, defects))
     maint = pd.DataFrame(rows, columns=[

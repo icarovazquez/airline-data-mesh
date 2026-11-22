@@ -80,3 +80,21 @@ def test_tables_carry_no_answer_columns():
     banned = {"shortage", "cause", "world", "crew_effect", "maintenance_effect", "truth"}
     for df in (crew, maint):
         assert not banned & {c.lower() for c in df.columns}
+
+
+def test_worlds_differ_only_where_the_cause_is_planted():
+    c_crew, m_crew, _ = run(WORLDS["crew"])
+    c_mnt, m_mnt, _ = run(WORLDS["maintenance"])
+    c_none, m_none, _ = run(WORLDS["neither"])
+    # The crew world's maintenance table is the neither world's, exactly.
+    pd.testing.assert_frame_equal(m_crew, m_none)
+    # The maintenance world's crew table is the neither world's, exactly.
+    pd.testing.assert_frame_equal(c_mnt, c_none)
+    # Planted tables differ from neither only on event days.
+    ev = [D(6), D(7), D(8)]
+    off = ~c_crew.day.isin(ev)
+    pd.testing.assert_frame_equal(c_crew[off].reset_index(drop=True),
+                                  c_none[off].reset_index(drop=True))
+    off_m = ~m_mnt.day.isin(ev)
+    pd.testing.assert_frame_equal(m_mnt[off_m].reset_index(drop=True),
+                                  m_none[off_m].reset_index(drop=True))
